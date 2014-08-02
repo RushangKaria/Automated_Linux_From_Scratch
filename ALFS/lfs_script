@@ -1,0 +1,100 @@
+#!/bin/bash -e
+
+# This script is used to automate the build of LFS-7.5
+# Pre-requistes
+# 1. LFS Parition is made and formatted to ext3/4
+# 2. the packages are available in a file
+
+LFS_CONFIG_FILE="lfs_data.config"
+
+source $LFS_CONFIG_FILE
+
+if [ ! -f $LFS_DATA_FILE ]; then
+sudo apt-get update
+sudo apt-get -y install bison gawk vim-common g++ libc-dev build-essential vim-common
+echo "MOUNTED=n" > $LFS_DATA_FILE
+chmod 666 $LFS_DATA_FILE
+fi
+
+if [ ! -d $LFS_HOME ]; then
+sudo mkdir $LFS_HOME
+fi
+
+########## MAIN #########
+#
+#
+
+if [ $(grep "MOUNTED=n" $LFS_DATA_FILE) ]; then
+sudo ./mounter $LFS_HOME $LFS_PARTITION $LFS_DATA_FILE "mount"
+fi
+
+if [ ! $(grep "SOURCES_DOWNLOADED=y" $LFS_DATA_FILE) ]; then
+sudo ./download_sources $LFS_SOURCES $LFS_SOURCE_LIST $MD5SUM_FILE $LFS_DATA_FILE
+fi
+
+if [ ! $(grep "TOOLS_DIRECTORY=y" $LFS_DATA_FILE) ]; then
+sudo mkdir $LFS_TOOLS
+sudo ln -sv $LFS_TOOLS /
+
+echo "TOOLS_DIRECTORY=y" >> $LFS_DATA_FILE
+fi
+
+if [ ! $(grep "LFS_USER_ADDED=y" $LFS_DATA_FILE) ]; then 
+sudo groupadd $LFS_GROUP
+sudo useradd -s /bin/bash -g $LFS_GROUP -m -k /dev/null $LFS_USER
+sudo passwd $LFS_USER
+sudo chown $LFS_USER $LFS_TOOLS
+sudo chown $LFS_USER $LFS_SOURCES
+sudo -v -A -g $LFS_GROUP -u $LFS_USER
+
+sudo    cat > /home/$LFS_USER/.bash_profile << "EOF"
+    exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash 
+EOF
+    
+
+sudo    cat > /home/$LFS_USER/.bashrc << "EOF"
+    set +h
+    umask 022
+    LFS_HOME=/media/lfs
+    LFS_GROUP=lfs
+    LFS_VERSION=7.5
+    SYSTEMD_ENABLED=true
+    LFS_PARTITION=/dev/sda6
+    LFS_SOURCES=$LFS_HOME/sources
+    LFS_TOOLS=$LFS_HOME/tools
+    LFS_DATA_FILE="lfs_progress.dat"
+    
+    LC_ALL=POSIX
+    LFS_TGT=$(uname -m)-lfs-linux-gnu
+    PATH=/tools/bin:/bin:/usr/bin
+    export LC_ALL LFS_TGT PATH
+    
+EOF
+
+sudo echo "cd $SCRIPT_ROOT_PATH" >> /home/$LFS_USER/.bashrc
+sudo echo "./lfs_script" >> /home/$LFS_USER/.bashrc
+
+echo "LFS_USER_ADDED=y" >> $LFS_DATA_FILE
+echo "LFS_USER_LOGGED=n" >> $LFS_DATA_FILE
+fi
+
+if [ ! $(grep "LFS_USER_LOGGED=y" $LFS_DATA_FILE) ]; then
+sed -i 's/LFS_USER_LOGGED=n/LFS_USER_LOGGED=y/' $LFS_DATA_FILE
+echo "Enter password for lfs user"
+su $LFS_USER
+fi
+
+if [ $USER == $LFS_USER ]; then
+./temporary_chain_builder.sh $LFS_CONFIG_FILE
+fi
+
+##### CLEAN UP #####
+
+if [ ! $USER == $LFS_USER ]; then
+sed -i 's/LFS_USER_LOGGED=y/LFS_USER_LOGGED=n/' $LFS_DATA_FILE
+
+if [ $(grep "MOUNTED=y" $LFS_DATA_FILE) ]; then
+sudo ./mounter $LFS_HOME $LFS_PARTITION $LFS_DATA_FILE "unmount"
+fi
+fi
+

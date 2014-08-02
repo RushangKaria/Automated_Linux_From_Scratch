@@ -1,0 +1,67 @@
+                 Automated LFS builder v 0.0.1
+
+Index
+I.   Authors
+II.  Description
+III. Copyright
+IV.  System Requirements
+V.   Using the Library
+VI.  Running the samples
+
+I. Authors:
+
+1. Rushang Vinod Vandana Karia
+      - Masters in Computer Science
+      - Arizona State 
+      - Rushang.Karia@asu.edu
+
+2. Shrijal Pravin Gandhi
+      - Research Assitant
+      - Decision Theater (dt.asu.edu)
+      - Shrijal.Gandhi@asu.edu
+
+II. Description:
+The Automated LFS builder is a set of scripts that can be used
+to automate the build of an LFS system.
+
+More information about Linux From Scratch can be found out at
+http://www.linuxfromscratch.org/
+
+This system requires Linux and does not support other
+Operating Systems.
+
+Also make sure your distribution has gcc < 4.8
+
+This software has been validated on Ubuntu 12.04 (precise pangoling) 64-bit
+
+There are a few changes the you need to make in the configuration
+file and system first
+
+1. Set up the partition (Create it manually)
+2. Update its name in lfs_data.config
+3. Change other settings if you want
+
+Please as the root user (without using sudo) type the following in a
+terminal
+
+./lfs_script.
+
+Please email bug reports to the authors.
+
+III. COPYRIGHT
+
+    Copyright (C) 2014  Rushang Karia, Shrijal Gandhi
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+

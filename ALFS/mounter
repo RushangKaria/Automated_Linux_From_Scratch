@@ -1,0 +1,38 @@
+#!/bin/bash -e
+
+LFS_HOME=$1
+LFS_PARTITION=$2
+LFS_DATA_FILE=$3
+COMMAND=$4
+
+echo "At mounter :: " $4
+
+lfs_mount()
+{
+
+    if [ ! -d $LFS_HOME ]; then
+    mkdir $LFS_HOME
+    fi
+
+    mount $LFS_PARTITION $LFS_HOME
+
+    if [ ! $(cat $LFS_DATA_FILE | grep "MOUNTED") ]; then
+    echo "MOUNTED=y" >> $LFS_DATA_FILE
+    else
+    sed -i 's/MOUNTED=n/MOUNTED=y/' $LFS_DATA_FILE
+    fi
+}
+
+lfs_unmount()
+{
+    umount $LFS_HOME
+    sed -i 's/MOUNTED=y/MOUNTED=n/' $LFS_DATA_FILE      
+}
+
+if [ $COMMAND == 'mount' ]; then
+lfs_mount
+else
+lfs_unmount
+fi
+
+

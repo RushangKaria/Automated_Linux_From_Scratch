@@ -1,0 +1,31 @@
+#!/bin/bash -e
+
+LFS_SOURCES=$1
+LFS_SOURCE_LIST=$2
+MD5SUM_FILE=$3
+LFS_DATA_FILE=$4
+
+echo "Downloading Sources" $LFS_SOURCES
+
+if [ ! -d $LFS_SOURCES ]; then
+
+    mkdir $LFS_SOURCES
+    chmod a+wt $LFS_SOURCES
+    wget -i $LFS_SOURCE_LIST -P $LFS_SOURCES
+
+    cp -f $MD5SUM_FILE $LFS_SOURCES/
+    pushd $LFS_SOURCES
+    md5sum -c $LFS_SOURCES/$MD5SUM_FILE > "verified"
+    
+            if [ $(grep "NOT_OK" verified) ]; then
+            popd
+            exit -1
+            fi
+    popd
+
+echo "SOURCES_DOWNLOADED=y" >> $LFS_DATA_FILE
+    
+fi
+
+
+
