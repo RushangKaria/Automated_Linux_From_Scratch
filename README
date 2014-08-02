@@ -1,5 +1,5 @@
                  Automated LFS builder v 0.0.1
-
+                           Systemd
 Index
 I.   Authors
 II.  Description
@@ -22,7 +22,7 @@ I. Authors:
 
 II. Description:
 The Automated LFS builder is a set of scripts that can be used
-to automate the build of an LFS system.
+to automate the build of an LFS Systemd Systemd
 
 More information about Linux From Scratch can be found out at
 http://www.linuxfromscratch.org/
